@@ -79,3 +79,11 @@ The dog breed identification model is trained using the **Xception** architectur
 
 ## Prediction
 The trained model is saved as "Final_dog_identification.h5" and can be loaded for making predictions. The provided code demonstrates how to load the model, preprocess an image, and predict the dog breed. The prediction includes checking if the confidence of the prediction is above a specified threshold.
+
+## App Screenshot
+
+Here’s a screenshot of the app working:
+
+![App Screenshot](Screenshots/Screenshot 2025-04-17 201546.png)
+
+![App Screenshot](Screenshots/Screenshot 2025-04-17 201709.png)
