@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 
 # Configure the API key
-client = genai.Client(api_key="AIzaSyC9TAbs9YGIt31bsN8A5gFRVzdYfp3CIsE")
+client = genai.Client(api_key="AIzaSyC9")
 
 app = Flask(__name__)
 
