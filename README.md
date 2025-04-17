@@ -8,7 +8,7 @@ This repository contains the source code for a Flask web application that identi
 ## Prerequisites
 - Python 3.x
 - Flask
-- Gemini API key
+- [Gemini API](https://ai.google.dev/gemini-api/docs)
 
 ## Setup
 1. **Clone the repository:**
@@ -21,7 +21,7 @@ This repository contains the source code for a Flask web application that identi
    pip install -r requirements.txt
 
 3. **Obtain OpenAI API Key**
-    - Visit [Gemini API]([https://ai.google.dev/gemini-api/docs]) to sign up for an account if you don't have one.
+    - Visit [Gemini API](https://ai.google.dev/gemini-api/docs) to sign up for an account if you don't have one.
     
     - Once logged in, navigate the dashboard to find your "Get a Gemini API Key".
 
