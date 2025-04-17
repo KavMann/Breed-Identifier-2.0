@@ -53,11 +53,29 @@ Upload an Image:
 ## Dataset
 The training data is sourced from a CSV file (labels.csv) containing information about dog breeds and corresponding image file names. The dataset is preprocessed to include only a specified number of unique dog breeds.
 
-## Model Architecture
-The model is built using the Xception architecture, a pre-trained model on the ImageNet dataset. The top layers of Xception are modified to suit the specific task of dog breed identification. Batch normalization, global average pooling, and dropout layers are added to enhance the model's performance.
+## Model Architecture & Training
 
-## Training
-The model is trained using an ImageDataGenerator for data augmentation. The training and testing datasets are split in an 80:20 ratio. The compiled model is trained using the RMSprop optimizer and sparse categorical crossentropy loss function.
+The dog breed identification model is trained using the **Xception** architecture, which is pre-trained on ImageNet. The training process involves two main phases:
+
+### **Phase 1: Freeze Base Model**
+- The base model (Xception) is loaded with pre-trained ImageNet weights.
+- The base layers of the Xception model are frozen, meaning they are not updated during training. Only the custom top layers (including a dropout layer and a dense layer for classification) are trained.
+- This phase helps the model learn to classify dog breeds based on the pre-learned features of Xception.
+
+### **Phase 2: Fine-Tune the Model**
+- In this phase, the top 50 layers of the Xception model are unfrozen, allowing the model to fine-tune these layers while keeping the lower layers frozen.
+- A lower learning rate is used for this phase to prevent overfitting and ensure gradual learning.
+
+### **Training Details**
+- **Data Augmentation:** The model is trained using `ImageDataGenerator`, which applies transformations like rotation, width/height shifts, shear, zoom, and horizontal flip to augment the dataset and prevent overfitting.
+- **Class Weights:** Class weights are computed to balance the dataset and prevent the model from being biased towards overrepresented dog breeds. This ensures that the model learns equally well for all breeds, even those with fewer images.
+- **Early Stopping and Learning Rate Scheduling:** 
+   - **EarlyStopping:** Stops training early if the validation loss doesn’t improve for 8 consecutive epochs, preventing overfitting.
+   - **ReduceLROnPlateau:** Reduces the learning rate when the validation loss plateaus, allowing the model to converge more smoothly.
+
+### **Saving the Model**
+- After both phases of training, the model is saved as `Final_dog_identification.h5`. This file can be loaded later to make predictions without retraining the model.
+
 
 ## Prediction
 The trained model is saved as "Final_dog_identification.h5" and can be loaded for making predictions. The provided code demonstrates how to load the model, preprocess an image, and predict the dog breed. The prediction includes checking if the confidence of the prediction is above a specified threshold.
