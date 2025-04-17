@@ -84,6 +84,6 @@ The trained model is saved as "Final_dog_identification.h5" and can be loaded fo
 
 Here’s a screenshot of the app working:
 
-![App Screenshot](Screenshots/Screenshot 2025-04-17 201546.png)
+![App Screenshot](Screenshots/Landing.png)
 
-![App Screenshot](Screenshots/Screenshot 2025-04-17 201709.png)
+![App Screenshot](Screenshots/Result.png)
