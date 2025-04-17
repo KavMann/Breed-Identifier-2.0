@@ -1,0 +1,165 @@
+html,
+body {
+  height: 100%;
+}
+
+.bg {
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(135deg, #bebebe, #ffdab9, #bc8f8f),
+    url("/static/Comp_1.gif") center center / cover no-repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  padding: 40px 0;
+  background-color: #f5f5f5;
+}
+
+.form-signin {
+  width: 100%;
+  max-width: 700px;
+  text-align: center;
+  margin: auto;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.2);
+  color: #291313;
+}
+
+.form-signin h1 {
+  margin-top: 0;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  padding: 15px;
+}
+
+.form-signin form {
+  padding: 15px;
+}
+
+.form-signin input[type="submit"] {
+  background: linear-gradient(-135deg, #555555, #ffa07a, #8b4513);
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+
+.form-signin input[type="submit"]:hover {
+  background: linear-gradient(-135deg, #8b4513, #ffa07a, #555555);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.form-control {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.form-control:focus {
+  border-color: #ced4da;
+  box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.2);
+}
+
+.form-floating {
+  position: relative;
+  width: 500px;
+  margin-left: 98px;
+}
+
+.breed-details {
+  text-align: justify;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.26);
+  backdrop-filter: blur(10px);
+  box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.2);
+}
+
+ul,
+li,
+p {
+  padding-right: 15px;
+}
+
+.gif-blend {
+  mix-blend-mode: exclusion;
+  height: 450px;
+  position: relative;
+  z-index: 1;
+  border-radius: 10px;
+}
+
+.bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/static/Comp_1.gif") center/cover no-repeat;
+  opacity: 0.05; /* soft visual texture */
+}
+
+.img-preview {
+  width: 100%;
+  height: auto;
+  max-width: 650px;
+  margin: auto;
+  display: block;
+  border-radius: 5px;
+  box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.2);
+}
+
+.upload-box {
+  border: 2px dashed #bbb;
+  padding: 20px;
+  text-align: center;
+  border-radius: 12px;
+  background-color: #fff5ec;
+  transition: background 0.3s;
+}
+.upload-box.highlight {
+  background-color: #ffe3cd;
+}
+.btn-gradient {
+  background: linear-gradient(to right, #d08860, #9c6f52);
+  border: none;
+  color: white;
+  padding: 10px 25px;
+  border-radius: 8px;
+}
+.img-prev {
+  margin: 10px auto;
+  height: auto;
+  border-radius: 10px;
+  max-width: 450px;
+  width: 100%;
+  display: none;
+  align-self: center;
+}
+
+.upload-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.upload-row .btn {
+  white-space: nowrap;
+  background: linear-gradient(135deg, #8b4513, #ffa07a, #8b4513);
+}
+.upload-row .form-control {
+  min-width: 250px;
+}

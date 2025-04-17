@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+    <meta charset="UTF-8" />
+    <title>DOG BREED IDENTIFICATION</title>
+  </head>
+  <body>
+    <div class="bg"></div>
+    <main class="form-signin glassmorphism">
+      <h1>DOG BREED IDENTIFICATION</h1>
+      <img
+        src="https://www.thesprucepets.com/thmb/nAfZqzn_BhMmJ2z2rmbGkO439xM=/4000x0/filters:no_upscale():strip_icc()/spruce-pets-200-types-of-dogs-45a7bd12aacf458cb2e77b841c41abe7.jpg"
+        class="gif-blend"
+      />
+      <form
+        id="upload-form"
+        action="/"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <!-- Drag & Drop or Click to Upload -->
+        <div id="drop-area" class="upload-box">
+          <p>Drag & drop an image here or click to select</p>
+          <input
+            class="form-control"
+            type="file"
+            name="file"
+            id="fileElem"
+            accept="image/*"
+            hidden
+          />
+          <div
+            class="upload-row d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3"
+          >
+            <button
+              type="button"
+              onclick="document.getElementById('fileElem').click()"
+              class="btn btn-secondary"
+            >
+              Choose File
+            </button>
+            <input
+              type="url"
+              name="image_url"
+              id="urlInput"
+              class="form-control flex-grow-1"
+              placeholder="Or paste image URL here"
+              style="width: 50px"
+            />
+          </div>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="mt-3 text-center">
+          <img id="preview" src="#" alt="Image Preview" class="img-prev" />
+        </div>
+
+        <br />
+        <input type="submit" value="Predict Breed" class="btn btn-gradient" />
+      </form>
+
+      {% if image_path %}
+      <img
+        src="{{ url_for('static', filename=image_path) }}"
+        alt="Uploaded Image"
+        class="img-preview"
+      />
+      {% if predicted_breed %}
+      <h2>Breed for this Dog is:</h2>
+      <h3>{{ predicted_breed.replace('_', ' ').title() }}</h3>
+      <div class="breed-details">
+        <h3>Basic Characteristics:</h3>
+        <ul>
+          {{ breed_info|safe }}
+        </ul>
+        <h3>Basic Needs:</h3>
+        <ul>
+          {{ breed_needs|safe }}
+        </ul>
+      </div>
+      {% else %}
+      <h3>The submitted image is not identified as a dog.</h3>
+      {% endif %} {% endif %}
+    </main>
+    <script>
+      const dropArea = document.getElementById("drop-area");
+      const fileInput = document.getElementById("fileElem");
+      const preview = document.getElementById("preview");
+      const urlInput = document.getElementById("urlInput");
+
+      // Handle drag and drop
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropArea.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropArea.classList.add("highlight");
+        });
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropArea.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropArea.classList.remove("highlight");
+        });
+      });
+
+      dropArea.addEventListener("drop", (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        fileInput.files = files;
+        showPreview(files[0]);
+      });
+
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files[0]) {
+          showPreview(fileInput.files[0]);
+        }
+      });
+
+      urlInput.addEventListener("input", () => {
+        const url = urlInput.value.trim();
+        if (url) {
+          preview.src = url;
+          preview.style.display = "block";
+        }
+      });
+
+      function showPreview(file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    </script>
+    <script>
+      const form = document.getElementById("upload-form");
+
+      form.addEventListener("submit", function (e) {
+        const fileSelected = fileInput.files.length > 0;
+        const urlEntered = urlInput.value.trim().length > 0;
+
+        if (!fileSelected && !urlEntered) {
+          e.preventDefault();
+          alert("Please upload a file or enter an image URL.");
+        }
+      });
+    </script>
+  </body>
+</html>
