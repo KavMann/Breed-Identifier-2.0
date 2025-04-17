@@ -1,7 +1,31 @@
+# Virtual environment
 venv/
+
+# Model files
+*.h5
+
+# Compiled Python files
 *.pyd
 *.dll
-*.h5
+*.so
+
+# Caches and logs
 __pycache__/
-.DS_Store
 *.log
+
+# System files
+.DS_Store
+
+# Training/testing data
+train/
+test/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# VSCode or other IDE settings
+.vscode/
+.idea/
+
+# Git LFS artifacts (optional but helpful if you tried it before)
+.gitattributes
