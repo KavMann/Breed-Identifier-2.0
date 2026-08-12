@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DOG BREED IDENTIFICATION</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -8,28 +11,20 @@
     <link
       rel="stylesheet"
       type="text/css"
-      href="{{ url_for('static', filename='css/main.css') }}"
+      href="{{ url_for('static', filename='css/main.css') }}?v=20260812-glass-plus"
     />
-    <meta charset="UTF-8" />
-    <title>DOG BREED IDENTIFICATION</title>
   </head>
   <body>
     <div class="bg"></div>
+
     <main class="form-signin glassmorphism">
       <h1>DOG BREED IDENTIFICATION</h1>
-      <img
-        src="https://www.thesprucepets.com/thmb/nAfZqzn_BhMmJ2z2rmbGkO439xM=/4000x0/filters:no_upscale():strip_icc()/spruce-pets-200-types-of-dogs-45a7bd12aacf458cb2e77b841c41abe7.jpg"
-        class="gif-blend"
-      />
-      <form
-        id="upload-form"
-        action="/"
-        method="POST"
-        enctype="multipart/form-data"
-      >
-        <!-- Drag & Drop or Click to Upload -->
+
+      <form id="prediction-form" enctype="multipart/form-data">
         <div id="drop-area" class="upload-box">
-          <p>Drag & drop an image here or click to select</p>
+          <p class="upload-title">Drag an image into this area</p>
+          <p class="upload-note">Use the controls below to browse locally or paste a direct image URL.</p>
+
           <input
             class="form-control"
             type="file"
@@ -38,91 +33,146 @@
             accept="image/*"
             hidden
           />
-          <div
-            class="upload-row d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3"
-          >
-            <button
-              type="button"
-              onclick="document.getElementById('fileElem').click()"
-              class="btn btn-secondary"
-            >
-              Choose File
-            </button>
-            <input
-              type="url"
-              name="image_url"
-              id="urlInput"
-              class="form-control flex-grow-1"
-              placeholder="Or paste image URL here"
-              style="width: 50px"
-            />
-          </div>
         </div>
 
-        <!-- Image Preview -->
+        <div class="upload-row">
+          <button
+            type="button"
+            id="choose-file"
+            class="btn btn-secondary choose-file-btn"
+          >
+            Choose File
+          </button>
+          <span class="upload-divider">or</span>
+          <input
+            type="url"
+            name="image_url"
+            id="urlInput"
+            class="form-control flex-grow-1"
+            placeholder="Paste a direct image URL"
+          />
+        </div>
+
         <div class="mt-3 text-center">
           <img id="preview" src="#" alt="Image Preview" class="img-prev" />
         </div>
 
-        <br />
-        <input type="submit" value="Predict Breed" class="btn btn-gradient" />
+        <div id="message" class="message" hidden></div>
+
+        <input
+          type="submit"
+          value="Predict Breed"
+          class="btn btn-gradient mt-3"
+        />
       </form>
 
-      {% if image_path %}
-      <img
-        src="{{ url_for('static', filename=image_path) }}"
-        alt="Uploaded Image"
-        class="img-preview"
-      />
-      {% if predicted_breed %}
-      <h2>Breed for this Dog is:</h2>
-      <h3>{{ predicted_breed.replace('_', ' ').title() }}</h3>
-      <div class="breed-details">
-        <h3>Basic Characteristics:</h3>
-        <ul>
-          {{ breed_info|safe }}
-        </ul>
-        <h3>Basic Needs:</h3>
-        <ul>
-          {{ breed_needs|safe }}
-        </ul>
-      </div>
-      {% else %}
-      <h3>The submitted image is not identified as a dog.</h3>
-      {% endif %} {% endif %}
+      <section id="result-panel" class="result-panel" hidden>
+        <div class="prediction-summary">
+          <span id="confidence-label" class="confidence-label">Low</span>
+          <h2>Breed for this Dog is:</h2>
+          <h3 id="breed-name">Breed</h3>
+          <div class="summary-metrics">
+            <span>
+              <strong id="confidence-score">0%</strong>
+              <small>confidence</small>
+            </span>
+            <span>
+              <strong id="inference-time">0 ms</strong>
+              <small>analysis time</small>
+            </span>
+          </div>
+        </div>
+
+        <p id="low-confidence-warning" class="low-confidence" hidden>
+          Low-confidence prediction. The image may contain a mixed breed, an
+          unsupported breed, or no dog.
+        </p>
+
+        <p id="dog-gate-message" class="dog-gate-message" hidden></p>
+
+        <div class="breed-details">
+          <div id="top-five-section">
+            <h3>Top Five Predictions:</h3>
+            <div id="prediction-bars" class="prediction-bars"></div>
+          </div>
+
+          <div id="gradcam-section" class="gradcam-section" hidden>
+            <h3>Model Attention Map:</h3>
+            <img
+              id="gradcam-image"
+              class="gradcam-image"
+              alt="Grad-CAM heatmap overlay"
+            />
+            <p class="gradcam-explainer">
+              Highlighted regions indicate the image areas that most influenced
+              the breed prediction.
+            </p>
+          </div>
+
+          <div class="breed-info-cards">
+            <article class="breed-info-card">
+              <h3>Breed Description</h3>
+              <p id="breed-description"></p>
+            </article>
+
+            <article class="breed-info-card">
+              <h3>Temperament</h3>
+              <p id="breed-temperament"></p>
+            </article>
+
+            <article class="breed-info-card">
+              <h3>Care Requirements</h3>
+              <p id="breed-care"></p>
+            </article>
+          </div>
+        </div>
+      </section>
     </main>
+
     <script>
+      const form = document.getElementById("prediction-form");
       const dropArea = document.getElementById("drop-area");
       const fileInput = document.getElementById("fileElem");
+      const chooseFileButton = document.getElementById("choose-file");
       const preview = document.getElementById("preview");
       const urlInput = document.getElementById("urlInput");
+      const message = document.getElementById("message");
+      const resultPanel = document.getElementById("result-panel");
+      const submitButton = form.querySelector('input[type="submit"]');
+      const LOCAL_FLASK_ORIGINS = [
+        window.location.origin,
+        "http://localhost:5000",
+        "http://127.0.0.1:5000",
+      ];
 
-      // Handle drag and drop
+      chooseFileButton.addEventListener("click", () => fileInput.click());
+
       ["dragenter", "dragover"].forEach((eventName) => {
-        dropArea.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+        dropArea.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
           dropArea.classList.add("highlight");
         });
       });
 
       ["dragleave", "drop"].forEach((eventName) => {
-        dropArea.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+        dropArea.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
           dropArea.classList.remove("highlight");
         });
       });
 
-      dropArea.addEventListener("drop", (e) => {
-        const dt = e.dataTransfer;
-        const files = dt.files;
+      dropArea.addEventListener("drop", (event) => {
+        const files = event.dataTransfer.files;
         fileInput.files = files;
+        urlInput.value = "";
         showPreview(files[0]);
       });
 
       fileInput.addEventListener("change", () => {
         if (fileInput.files[0]) {
+          urlInput.value = "";
           showPreview(fileInput.files[0]);
         }
       });
@@ -130,32 +180,193 @@
       urlInput.addEventListener("input", () => {
         const url = urlInput.value.trim();
         if (url) {
+          fileInput.value = "";
           preview.src = url;
           preview.style.display = "block";
         }
       });
 
-      function showPreview(file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          preview.src = e.target.result;
-          preview.style.display = "block";
-        };
-        reader.readAsDataURL(file);
-      }
-    </script>
-    <script>
-      const form = document.getElementById("upload-form");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-      form.addEventListener("submit", function (e) {
         const fileSelected = fileInput.files.length > 0;
         const urlEntered = urlInput.value.trim().length > 0;
 
         if (!fileSelected && !urlEntered) {
-          e.preventDefault();
-          alert("Please upload a file or enter an image URL.");
+          showError("Please upload a file or enter an image URL.");
+          return;
         }
+
+        const formData = new FormData();
+        const endpoint = fileSelected ? "/predict" : "/predict-url";
+
+        if (fileSelected) {
+          formData.append("file", fileInput.files[0]);
+        } else {
+          formData.append("image_url", urlInput.value.trim());
+        }
+
+        await submitPrediction(endpoint, formData);
       });
+
+      function showPreview(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          preview.src = event.target.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+
+      async function submitPrediction(endpoint, formData) {
+        setLoading(true);
+        try {
+          const response = await fetchWithFallback(endpoint, formData);
+          const payload = await response.json();
+          if (!response.ok || !payload.ok) {
+            throw new Error(payload.error || "Prediction failed.");
+          }
+          renderResult(payload.result);
+          showMessage("Analysis complete.");
+        } catch (error) {
+          showError(error.message);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      async function fetchWithFallback(endpoint, formData) {
+        for (const origin of LOCAL_FLASK_ORIGINS) {
+          const url = origin ? `${origin}${endpoint}` : endpoint;
+          try {
+            return await postForm(url, formData);
+          } catch {
+            continue;
+          }
+        }
+
+        throw new Error(
+          "Could not reach the Flask server. Start it with python app.py, then open http://localhost:5000/."
+        );
+      }
+
+      async function postForm(url, formData) {
+        return fetch(url, {
+          method: "POST",
+          body: formData,
+        });
+      }
+
+      function renderResult(result) {
+        resultPanel.hidden = false;
+        document.getElementById("breed-name").textContent = result.breed;
+        document.getElementById("confidence-score").textContent =
+          `${result.confidence_percent.toFixed(2)}%`;
+        document.getElementById("inference-time").textContent =
+          `${result.inference_time_ms.toFixed(2)} ms`;
+
+        const confidenceLabel = document.getElementById("confidence-label");
+        confidenceLabel.textContent = result.confidence_label;
+        confidenceLabel.className =
+          `confidence-label ${result.confidence_label.toLowerCase()}`;
+
+        document.getElementById("low-confidence-warning").hidden =
+          !result.low_confidence;
+
+        renderDogGate(result);
+        renderGradCam(result);
+
+        const predictions = result.top_five || [];
+        const topFiveSection = document.getElementById("top-five-section");
+        const bars = document.getElementById("prediction-bars");
+        bars.innerHTML = "";
+        topFiveSection.hidden = !predictions.length;
+
+        predictions.forEach((prediction) => {
+          const row = document.createElement("div");
+          row.className = "prediction-row";
+          row.innerHTML = `
+            <div class="prediction-topline">
+              <span>${prediction.display_name}</span>
+              <strong>${prediction.confidence_percent.toFixed(2)}%</strong>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: ${prediction.confidence_percent}%"></div>
+            </div>
+          `;
+          bars.appendChild(row);
+        });
+
+        const info = result.breed_info || {};
+        document.getElementById("breed-description").textContent =
+          info.description || "No description available.";
+        document.getElementById("breed-temperament").textContent =
+          info.temperament || "No temperament information available.";
+        document.getElementById("breed-care").textContent =
+          info.care_requirements || "No care information available.";
+      }
+
+      function renderDogGate(result) {
+        const message = document.getElementById("dog-gate-message");
+        const detection = result.dog_detection;
+
+        if (!detection || !detection.enabled) {
+          message.hidden = true;
+          return;
+        }
+
+        const probabilityText =
+          detection.dog_probability_percent === null ||
+          detection.dog_probability_percent === undefined
+            ? "unavailable"
+            : `${detection.dog_probability_percent.toFixed(2)}%`;
+
+        message.hidden = false;
+        message.className = result.is_dog
+          ? "dog-gate-message accepted"
+          : "dog-gate-message rejected";
+        message.textContent = result.is_dog
+          ? `Input validation passed. Dog likelihood: ${probabilityText}.`
+          : `Input validation rejected this image. ${detection.reason}`;
+      }
+
+      function renderGradCam(result) {
+        const section = document.getElementById("gradcam-section");
+        const image = document.getElementById("gradcam-image");
+        const gradcam = result.gradcam;
+
+        if (!gradcam || !gradcam.available || !gradcam.image) {
+          section.hidden = true;
+          image.removeAttribute("src");
+          return;
+        }
+
+        section.hidden = false;
+        image.src = gradcam.image;
+      }
+
+      function setLoading(isLoading) {
+        submitButton.disabled = isLoading;
+        chooseFileButton.disabled = isLoading;
+        if (isLoading) {
+          showMessage(
+            "Checking the image and preparing the breed analysis..."
+          );
+        }
+      }
+
+      function showMessage(text) {
+        message.hidden = false;
+        message.className = "message";
+        message.textContent = text;
+      }
+
+      function showError(text) {
+        message.hidden = false;
+        message.className = "message error";
+        message.textContent = text;
+      }
     </script>
   </body>
 </html>

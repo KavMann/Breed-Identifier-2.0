@@ -1,31 +1,57 @@
-# Virtual environment
+# Secrets and local environments
+.env
 venv/
+.venv/
 
-# Model files
-*.h5
-
-# Compiled Python files
+# Python caches
+__pycache__/
+*.py[cod]
 *.pyd
 *.dll
 *.so
 
-# Caches and logs
-__pycache__/
-*.log
-
-# System files
-.DS_Store
-
-# Training/testing data
-train/
-test/
-
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints/
-
-# VSCode or other IDE settings
-.vscode/
+# IDE files
 .idea/
+.vscode/
 
-# Git LFS artifacts (optional but helpful if you tried it before)
-.gitattributes
+# Training data and experiment output
+Legacy/
+Data collection/
+breeds/
+stanford_breeds/
+merged_breeds/
+data_split/
+quarantined_cross_label_duplicates/
+checkpoints/
+logs/
+merge_reports/
+cross_label_cleanup_report.csv
+*.zip
+
+# Training and maintenance scripts not required by Render
+dataset analysis.py
+dataset.py
+evaluate.py
+export_model.py
+gpucheck.py
+jsontest.py
+merge_breeds.py
+split.py
+test.py
+test_model.py
+thresh.py
+train.py
+utils.py
+
+# Ignore model artifacts by default, then allow deployment artifacts.
+*.h5
+*.pt
+*.onnx
+models/*
+!models/
+!models/dog_breed_classifier.pth
+!models/classes.json
+
+# Runtime uploads and generated files
+static/uploaded_image.jpg
+.DS_Store
