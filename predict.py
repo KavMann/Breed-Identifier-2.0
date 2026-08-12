@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import gc
 import json
 import time
 from io import BytesIO
@@ -185,9 +186,13 @@ def load_predictor(
             f"but config.py specifies {NUM_CLASSES}."
         )
 
-    model.load_state_dict(
-        checkpoint["model_state_dict"]
-    )
+    model_state_dict = checkpoint["model_state_dict"]
+
+    model.load_state_dict(model_state_dict)
+
+    del model_state_dict
+    del checkpoint
+    gc.collect()
 
     model = model.to(DEVICE)
     model.eval()

@@ -13,6 +13,9 @@ except ImportError:
 
 PROJECT_DIR = Path(__file__).resolve().parent
 
+TORCH_NUM_THREADS = int(os.getenv("TORCH_NUM_THREADS", "1"))
+torch.set_num_threads(max(1, TORCH_NUM_THREADS))
+
 DATA_DIR = PROJECT_DIR / "data_split"
 TRAIN_DIR = DATA_DIR / "train"
 VAL_DIR = DATA_DIR / "val"
