@@ -173,12 +173,14 @@ def inject_styles() -> None:
 
         [data-testid="stFileUploader"] small,
         [data-testid="stFileUploader"] svg,
-        [data-testid="stFileUploaderDropzoneInstructions"],
-        [data-testid="stFileUploader"] [data-testid="stMarkdownContainer"] {{
+        [data-testid="stFileUploaderDropzoneInstructions"] {{
             display: none;
         }}
 
         [data-testid="stFileUploader"] button {{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             min-height: 46px;
             width: 100%;
             border-radius: 8px;
@@ -187,6 +189,14 @@ def inject_styles() -> None:
             color: #4a3028;
             font-weight: 800;
             box-shadow: 0 8px 18px rgba(43, 26, 20, 0.1);
+        }}
+
+        [data-testid="stFileUploader"] button::after {{
+            content: "Choose File";
+        }}
+
+        [data-testid="stFileUploader"] button p {{
+            display: none;
         }}
 
         .stTextInput input {{
