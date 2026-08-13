@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import html
 import os
 from io import BytesIO
@@ -473,6 +474,17 @@ def open_uploaded_image(uploaded_file) -> Image.Image:
         raise ValueError("The uploaded file is not a valid image.") from error
 
 
+def data_uri_to_image(data_uri: str) -> Image.Image:
+    if "," not in data_uri:
+        raise ValueError("Invalid Grad-CAM image data.")
+
+    _, encoded = data_uri.split(",", 1)
+    image_bytes = base64.b64decode(encoded)
+
+    with Image.open(BytesIO(image_bytes)) as image:
+        return image.convert("RGB")
+
+
 def confidence_class(label: str) -> str:
     if label == "High":
         return "high"
@@ -539,7 +551,6 @@ def show_prediction(result: dict) -> None:
                 '<div class="result-card">'
                 '<span class="confidence-label low">Rejected</span>'
                 "<h3>Not a dog</h3>"
-                f"{render_dog_gate(result)}"
                 "</div>"
             ),
             unsafe_allow_html=True,
@@ -576,7 +587,6 @@ def show_prediction(result: dict) -> None:
             "</span>"
             "</div>"
             f"{low_warning}"
-            f"{render_dog_gate(result)}"
             "</section>"
         ),
         unsafe_allow_html=True,
@@ -608,7 +618,13 @@ def show_prediction(result: dict) -> None:
             ),
             unsafe_allow_html=True,
         )
-        st.image(gradcam["image"], use_container_width=True)
+        try:
+            st.image(
+                data_uri_to_image(gradcam["image"]),
+                use_container_width=True,
+            )
+        except Exception:
+            st.image(gradcam["image"], use_container_width=True)
         st.markdown(
             (
                 '<section class="details-card" style="margin-top: 0;">'
@@ -662,6 +678,15 @@ def show_prediction(result: dict) -> None:
         ),
         unsafe_allow_html=True,
     )
+
+
+def show_input_validation(result: dict) -> None:
+    validation_message = render_dog_gate(result)
+
+    if not validation_message:
+        return
+
+    st.markdown(validation_message, unsafe_allow_html=True)
 
 
 def show_main_card() -> None:
@@ -740,4 +765,5 @@ if result:
         '<div class="message-card">Analysis complete.</div>',
         unsafe_allow_html=True,
     )
+    show_input_validation(result)
     show_prediction(result)
