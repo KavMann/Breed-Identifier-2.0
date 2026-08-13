@@ -125,6 +125,7 @@ def inject_styles() -> None:
         .st-key-app_card [data-testid="stHorizontalBlock"],
         .st-key-app-card [data-testid="stHorizontalBlock"] {{
             align-items: center;
+            gap: 0.7rem;
         }}
 
         .st-key-app_card [data-testid="column"],
@@ -136,6 +137,11 @@ def inject_styles() -> None:
         .st-key-app_card [data-testid="column"] > div,
         .st-key-app-card [data-testid="column"] > div {{
             width: 100%;
+        }}
+
+        .st-key-app_card [data-testid="stVerticalBlock"],
+        .st-key-app-card [data-testid="stVerticalBlock"] {{
+            gap: 0.45rem;
         }}
 
         .main-title {{
@@ -192,6 +198,7 @@ def inject_styles() -> None:
 
         [data-testid="stFileUploader"] {{
             width: 100%;
+            margin: 0;
         }}
 
         [data-testid="stFileUploader"] section {{
@@ -204,9 +211,28 @@ def inject_styles() -> None:
             padding: 0;
         }}
 
+        [data-testid="stFileUploaderDropzone"] {{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 46px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+        }}
+
+        [data-testid="stFileUploaderDropzone"] > div {{
+            padding: 0;
+            width: 100%;
+        }}
+
         [data-testid="stFileUploader"] small,
         [data-testid="stFileUploader"] svg,
-        [data-testid="stFileUploaderDropzoneInstructions"] {{
+        [data-testid="stFileUploaderDropzoneInstructions"],
+        [data-testid="stFileUploaderFile"],
+        [data-testid="stFileUploaderFileName"],
+        [data-testid="stFileUploaderFileSize"],
+        [data-testid="stFileUploaderDeleteBtn"] {{
             display: none;
         }}
 
@@ -234,10 +260,15 @@ def inject_styles() -> None:
 
         .stTextInput input {{
             min-height: 46px;
+            height: 46px;
             border: 1px solid rgba(117, 91, 75, 0.22);
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.9);
             color: #291313;
+        }}
+
+        [data-testid="stTextInput"] {{
+            margin: 0;
         }}
 
         div.stButton > button {{
@@ -784,7 +815,7 @@ def show_app_card() -> None:
         )
 
         file_col, divider_col, url_col = st.columns(
-            [1.2, 0.3, 4.2],
+            [1.45, 0.32, 4.2],
             gap="small",
         )
 
