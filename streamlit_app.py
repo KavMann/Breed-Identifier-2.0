@@ -126,7 +126,7 @@ def inject_styles() -> None:
         }}
 
         .st-key-input_shell {{
-            margin-top: -1px;
+            margin-top: -18px;
             padding: 0 20px 22px;
             background:
                 linear-gradient(145deg, rgba(255, 255, 255, 0.62), rgba(255, 245, 236, 0.34)),
@@ -144,6 +144,15 @@ def inject_styles() -> None:
 
         .st-key-input_shell [data-testid="stHorizontalBlock"] {{
             align-items: center;
+        }}
+
+        .st-key-input_shell [data-testid="column"] {{
+            display: flex;
+            align-items: center;
+        }}
+
+        .st-key-input_shell [data-testid="column"] > div {{
+            width: 100%;
         }}
 
         .upload-box {{
@@ -245,8 +254,14 @@ def inject_styles() -> None:
             box-shadow: 0 10px 22px rgba(47, 93, 84, 0.22);
         }}
 
-        div.stButton {{
+        div.stButton,
+        [data-testid="stButton"] {{
             display: flex;
+            justify-content: center;
+        }}
+
+        .st-key-input_shell [data-testid="stButton"] {{
+            margin-top: 12px;
             justify-content: center;
         }}
 
