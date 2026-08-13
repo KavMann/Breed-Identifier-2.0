@@ -148,25 +148,49 @@ def inject_styles() -> None:
             line-height: 1.45;
         }}
 
-        div[data-testid="stTabs"] button {{
-            color: #4a3028;
-            font-weight: 800;
-        }}
-
-        div[data-testid="stTabs"] button[aria-selected="true"] {{
-            color: #2f5d54;
+        .input-row-label {{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            color: #785b4b;
+            font-weight: 900;
         }}
 
         [data-testid="stFileUploader"] {{
-            background: rgba(255, 255, 255, 0.34);
-            border: 1px solid rgba(255, 255, 255, 0.46);
-            border-radius: 12px;
-            padding: 10px;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+            width: 100%;
+        }}
+
+        [data-testid="stFileUploader"] section {{
+            padding: 0;
+            border: 0;
+            background: transparent;
+        }}
+
+        [data-testid="stFileUploader"] section > div {{
+            padding: 0;
+        }}
+
+        [data-testid="stFileUploader"] small,
+        [data-testid="stFileUploader"] svg,
+        [data-testid="stFileUploaderDropzoneInstructions"],
+        [data-testid="stFileUploader"] [data-testid="stMarkdownContainer"] {{
+            display: none;
+        }}
+
+        [data-testid="stFileUploader"] button {{
+            min-height: 46px;
+            width: 100%;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid rgba(117, 91, 75, 0.22);
+            color: #4a3028;
+            font-weight: 800;
+            box-shadow: 0 8px 18px rgba(43, 26, 20, 0.1);
         }}
 
         .stTextInput input {{
-            min-height: 42px;
+            min-height: 46px;
             border: 1px solid rgba(117, 91, 75, 0.22);
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.9);
@@ -714,15 +738,28 @@ def show_main_card() -> None:
 
 
 def show_input_controls() -> None:
-    uploaded_file = st.file_uploader(
-        "Choose File",
-        type=["jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff"],
-        help="JPEG, PNG, WebP, BMP, or TIFF up to 15 MB.",
-    )
-    image_url = st.text_input(
-        "Direct image URL",
-        placeholder="Paste a direct image URL",
-    )
+    file_col, divider_col, url_col = st.columns([1.2, 0.3, 4.2], gap="small")
+
+    with file_col:
+        uploaded_file = st.file_uploader(
+            "Choose File",
+            type=["jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff"],
+            help="JPEG, PNG, WebP, BMP, or TIFF up to 15 MB.",
+            label_visibility="collapsed",
+        )
+
+    with divider_col:
+        st.markdown(
+            '<div class="input-row-label">or</div>',
+            unsafe_allow_html=True,
+        )
+
+    with url_col:
+        image_url = st.text_input(
+            "Direct image URL",
+            placeholder="Paste a direct image URL",
+            label_visibility="collapsed",
+        )
 
     uploaded_image = None
 
