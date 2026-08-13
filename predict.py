@@ -158,11 +158,19 @@ def load_predictor(
         pretrained=False,
     )
 
-    checkpoint = torch.load(
-        model_path,
-        map_location=DEVICE,
-        weights_only=False,
-    )
+    try:
+        checkpoint = torch.load(
+            model_path,
+            map_location=DEVICE,
+            weights_only=True,
+            mmap=True,
+        )
+    except TypeError:
+        checkpoint = torch.load(
+            model_path,
+            map_location=DEVICE,
+            weights_only=True,
+        )
 
     if not isinstance(checkpoint, dict):
         raise RuntimeError(

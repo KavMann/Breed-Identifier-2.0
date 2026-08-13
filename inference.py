@@ -6,16 +6,10 @@ from dataclasses import dataclass
 from io import BytesIO
 from typing import Any
 
-import numpy as np
 import torch
 from dotenv import load_dotenv
 from flask import Request
 from PIL import Image, UnidentifiedImageError
-from torchvision import transforms
-from torchvision.models import (
-    EfficientNet_V2_S_Weights,
-    efficientnet_v2_s,
-)
 from werkzeug.datastructures import FileStorage
 
 from config import (
@@ -145,6 +139,11 @@ class DogDetector:
             return
 
         try:
+            from torchvision.models import (
+                EfficientNet_V2_S_Weights,
+                efficientnet_v2_s,
+            )
+
             weights = EfficientNet_V2_S_Weights.DEFAULT
             self.model = efficientnet_v2_s(weights=weights).to(DEVICE)
             self.model.eval()
@@ -226,6 +225,9 @@ class DogDetector:
 
 class GradCamGenerator:
     def __init__(self, model) -> None:
+        from torchvision import transforms
+        from torchvision.models import EfficientNet_V2_S_Weights
+
         self.model = model
         self.target_layer = model.features[-1]
         weights = EfficientNet_V2_S_Weights.DEFAULT
@@ -341,8 +343,9 @@ class GradCamGenerator:
 def create_heatmap_overlay(
     *,
     base_image: Image.Image,
-    heatmap: np.ndarray,
+    heatmap: Any,
 ) -> Image.Image:
+    import numpy as np
     import matplotlib
 
     matplotlib.use("Agg", force=True)
@@ -496,7 +499,11 @@ class InferenceService:
     def __init__(self) -> None:
         self.model, self.idx_to_class = load_predictor()
         self.dog_detector = DogDetector()
-        self.gradcam = GradCamGenerator(self.model)
+        self.gradcam = (
+            GradCamGenerator(self.model)
+            if GRADCAM_ENABLED
+            else None
+        )
         self.gemini = GeminiBreedInfoClient()
 
     def predict_uploaded_file(self, file: FileStorage) -> dict[str, Any]:
@@ -556,10 +563,18 @@ class InferenceService:
         normalized = normalize_prediction(result)
         normalized["is_dog"] = True
         normalized["dog_detection"] = dog_detection.__dict__
-        normalized["gradcam"] = self.gradcam.generate(
-            image=image,
-            class_index=result["best_prediction"]["class_index"],
-        )
+        if self.gradcam is None:
+            normalized["gradcam"] = {
+                "enabled": False,
+                "available": False,
+                "image": None,
+                "reason": "Grad-CAM is disabled.",
+            }
+        else:
+            normalized["gradcam"] = self.gradcam.generate(
+                image=image,
+                class_index=result["best_prediction"]["class_index"],
+            )
         normalized["breed_info"] = self.gemini.get_breed_information(
             normalized["breed"]
         ).__dict__
