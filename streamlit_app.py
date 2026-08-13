@@ -125,7 +125,7 @@ def inject_styles() -> None:
             padding: 22px 20px 18px;
         }}
 
-        .input-shell {{
+        .st-key-input_shell {{
             margin-top: -1px;
             padding: 0 20px 22px;
             background:
@@ -142,7 +142,7 @@ def inject_styles() -> None:
             color: #291313;
         }}
 
-        .input-shell [data-testid="stHorizontalBlock"] {{
+        .st-key-input_shell [data-testid="stHorizontalBlock"] {{
             align-items: center;
         }}
 
@@ -773,53 +773,59 @@ def show_main_card() -> None:
 
 
 def show_input_controls() -> None:
-    st.markdown('<div class="input-shell">', unsafe_allow_html=True)
-    file_col, divider_col, url_col = st.columns([1.2, 0.3, 4.2], gap="small")
-
-    with file_col:
-        uploaded_file = st.file_uploader(
-            "Choose File",
-            type=["jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff"],
-            help="JPEG, PNG, WebP, BMP, or TIFF up to 15 MB.",
-            label_visibility="collapsed",
+    with st.container(key="input_shell"):
+        file_col, divider_col, url_col = st.columns(
+            [1.2, 0.3, 4.2],
+            gap="small",
         )
 
-    with divider_col:
-        st.markdown(
-            '<div class="input-row-label">or</div>',
-            unsafe_allow_html=True,
-        )
+        with file_col:
+            uploaded_file = st.file_uploader(
+                "Choose File",
+                type=["jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff"],
+                help="JPEG, PNG, WebP, BMP, or TIFF up to 15 MB.",
+                label_visibility="collapsed",
+            )
 
-    with url_col:
-        image_url = st.text_input(
-            "Direct image URL",
-            placeholder="Paste a direct image URL",
-            label_visibility="collapsed",
-        )
+        with divider_col:
+            st.markdown(
+                '<div class="input-row-label">or</div>',
+                unsafe_allow_html=True,
+            )
 
-    uploaded_image = None
+        with url_col:
+            image_url = st.text_input(
+                "Direct image URL",
+                placeholder="Paste a direct image URL",
+                label_visibility="collapsed",
+            )
 
-    if uploaded_file is not None:
-        uploaded_image = open_uploaded_image(uploaded_file)
-        st.image(uploaded_image, use_container_width=True)
-    elif image_url:
-        st.image(image_url, use_container_width=True)
+        uploaded_image = None
 
-    if st.button("Predict Breed", type="primary", key="predict"):
-        if uploaded_image is None and not image_url.strip():
-            st.error("Please choose an image file or paste a direct image URL.")
-            return
+        if uploaded_file is not None:
+            uploaded_image = open_uploaded_image(uploaded_file)
+            st.image(uploaded_image, use_container_width=True)
+        elif image_url:
+            st.image(image_url, use_container_width=True)
 
-        with st.spinner("Checking the image and preparing the breed analysis..."):
-            if uploaded_image is not None:
-                st.session_state["prediction_result"] = (
-                    get_inference_service()._predict_image(uploaded_image)
+        if st.button("Predict Breed", type="primary", key="predict"):
+            if uploaded_image is None and not image_url.strip():
+                st.error(
+                    "Please choose an image file or paste a direct image URL."
                 )
-            else:
-                st.session_state["prediction_result"] = (
-                    get_inference_service().predict_url(image_url.strip())
-                )
-    st.markdown("</div>", unsafe_allow_html=True)
+                return
+
+            with st.spinner(
+                "Checking the image and preparing the breed analysis..."
+            ):
+                if uploaded_image is not None:
+                    st.session_state["prediction_result"] = (
+                        get_inference_service()._predict_image(uploaded_image)
+                    )
+                else:
+                    st.session_state["prediction_result"] = (
+                        get_inference_service().predict_url(image_url.strip())
+                    )
 
 
 inject_styles()
