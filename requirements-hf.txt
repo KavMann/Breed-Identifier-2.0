@@ -1,0 +1,8 @@
+Flask
+gunicorn
+google-genai
+matplotlib
+numpy
+Pillow
+python-dotenv
+requests

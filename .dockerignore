@@ -1,0 +1,22 @@
+.git
+.env
+.idea
+.vscode
+venv
+.venv
+__pycache__
+*.pyc
+*.pyd
+*.dll
+*.so
+Legacy
+Data collection
+breeds
+stanford_breeds
+merged_breeds
+data_split
+quarantined_cross_label_duplicates
+checkpoints
+logs
+merge_reports
+*.zip

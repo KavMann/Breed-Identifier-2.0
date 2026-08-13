@@ -1,3 +1,10 @@
+---
+title: Dog Breed Identifier
+sdk: docker
+app_port: 7860
+suggested_hardware: cpu-basic
+---
+
 # Dog Breed Identifier
 
 Flask web app for dog breed classification using an exported PyTorch EfficientNet V2-S model.
@@ -20,6 +27,8 @@ model.py
 predict.py
 wsgi.py
 requirements.txt
+requirements-hf.txt
+Dockerfile
 render.yaml
 runtime.txt
 models/
@@ -41,9 +50,31 @@ python app.py
 
 Open `http://127.0.0.1:5000/`.
 
+## Hugging Face Spaces Deployment
+
+This is the recommended free-tier target for the full demo. Hugging Face lists
+CPU Basic Spaces at 2 vCPU and 16 GB RAM, which is much more suitable for
+PyTorch, Grad-CAM, and the ImageNet dog gate than Render's free web service.
+
+Create a new Hugging Face Space with:
+
+- SDK: `Docker`
+- Hardware: `CPU Basic`
+- App port: `7860`
+
+The included `Dockerfile` enables:
+
+- `DOGBREED_DEVICE=cpu`
+- `DOGBREED_DOG_REJECTION=true`
+- `DOGBREED_GRADCAM=true`
+- `DOGBREED_TTA=false`
+
+Add `GEMINI_API_KEY` as a Space secret, not as a committed file.
+
 ## Render Deployment
 
-This repo includes `render.yaml`.
+This repo still includes `render.yaml`, but Render's free web service is too
+memory constrained for the full PyTorch demo.
 
 Render settings:
 
