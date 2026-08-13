@@ -487,17 +487,19 @@ def render_prediction_bars(predictions: list[dict]) -> str:
     for prediction in predictions:
         percent = float(prediction["confidence_percent"])
         rows.append(
-            f"""
-            <div class="prediction-row">
-              <div class="prediction-topline">
-                <span>{escape(prediction["display_name"])}</span>
-                <strong>{percent:.2f}%</strong>
-              </div>
-              <div class="bar-track">
-                <div class="bar-fill" style="width: {min(max(percent, 0.0), 100.0):.2f}%"></div>
-              </div>
-            </div>
-            """
+            (
+                '<div class="prediction-row">'
+                '<div class="prediction-topline">'
+                f'<span>{escape(prediction["display_name"])}</span>'
+                f"<strong>{percent:.2f}%</strong>"
+                "</div>"
+                '<div class="bar-track">'
+                '<div class="bar-fill" '
+                f'style="width: {min(max(percent, 0.0), 100.0):.2f}%">'
+                "</div>"
+                "</div>"
+                "</div>"
+            )
         )
 
     return "\n".join(rows)
@@ -584,38 +586,46 @@ def show_prediction(result: dict) -> None:
     gradcam_html = ""
 
     if gradcam.get("available") and gradcam.get("image"):
-        gradcam_html = f"""
-            <div class="gradcam-section">
-                <h3>Model Attention Map:</h3>
-                <img src="{escape(gradcam["image"])}" alt="Grad-CAM heatmap overlay" />
-                <p>Highlighted regions indicate the image areas that most influenced the breed prediction.</p>
-            </div>
-        """
+        gradcam_html = (
+            '<div class="gradcam-section">'
+            "<h3>Model Attention Map:</h3>"
+            f'<img src="{escape(gradcam["image"])}" '
+            'alt="Grad-CAM heatmap overlay" />'
+            "<p>Highlighted regions indicate the image areas that most "
+            "influenced the breed prediction.</p>"
+            "</div>"
+        )
 
     st.markdown(
-        f"""
-        <section class="details-card">
-            <h3>Top Five Predictions:</h3>
-            <div class="prediction-bars">
-                {render_prediction_bars(result.get("top_five", []))}
-            </div>
-            {gradcam_html}
-            <div class="breed-info-cards">
-                <article class="breed-info-card">
-                    <h3>Breed Description</h3>
-                    <p>{escape(breed_info.get("description", "No description available."))}</p>
-                </article>
-                <article class="breed-info-card">
-                    <h3>Temperament</h3>
-                    <p>{escape(breed_info.get("temperament", "No temperament information available."))}</p>
-                </article>
-                <article class="breed-info-card">
-                    <h3>Care Requirements</h3>
-                    <p>{escape(breed_info.get("care_requirements", "No care information available."))}</p>
-                </article>
-            </div>
-        </section>
-        """,
+        (
+            '<section class="details-card">'
+            "<h3>Top Five Predictions:</h3>"
+            '<div class="prediction-bars">'
+            f'{render_prediction_bars(result.get("top_five", []))}'
+            "</div>"
+            f"{gradcam_html}"
+            '<div class="breed-info-cards">'
+            '<article class="breed-info-card">'
+            "<h3>Breed Description</h3>"
+            "<p>"
+            f'{escape(breed_info.get("description", "No description available."))}'
+            "</p>"
+            "</article>"
+            '<article class="breed-info-card">'
+            "<h3>Temperament</h3>"
+            "<p>"
+            f'{escape(breed_info.get("temperament", "No temperament information available."))}'
+            "</p>"
+            "</article>"
+            '<article class="breed-info-card">'
+            "<h3>Care Requirements</h3>"
+            "<p>"
+            f'{escape(breed_info.get("care_requirements", "No care information available."))}'
+            "</p>"
+            "</article>"
+            "</div>"
+            "</section>"
+        ),
         unsafe_allow_html=True,
     )
 
