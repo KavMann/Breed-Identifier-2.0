@@ -28,6 +28,7 @@ predict.py
 wsgi.py
 requirements.txt
 requirements-hf.txt
+requirements-streamlit.txt
 Dockerfile
 render.yaml
 runtime.txt
@@ -70,6 +71,30 @@ The included `Dockerfile` enables:
 - `DOGBREED_TTA=false`
 
 Add `GEMINI_API_KEY` as a Space secret, not as a committed file.
+
+## Streamlit Community Cloud Deployment
+
+If Hugging Face Docker Spaces is unavailable on your account, Streamlit
+Community Cloud is the next free option to try. It has a higher memory limit
+than Render's free web service, but it uses `streamlit_app.py` instead of the
+Flask frontend.
+
+Deploy settings:
+
+- Repository: this GitHub repo
+- Branch: `main`
+- Main file path: `streamlit_app.py`
+- Python version: `3.11`
+- Requirements file: `requirements-streamlit.txt`
+
+Add these secrets or environment variables:
+
+- `GEMINI_API_KEY`
+- `DOGBREED_DEVICE=cpu`
+- `TORCH_NUM_THREADS=1`
+- `DOGBREED_TTA=false`
+- `DOGBREED_DOG_REJECTION=true`
+- `DOGBREED_GRADCAM=true`
 
 ## Render Deployment
 
