@@ -535,66 +535,55 @@ def render_dog_gate(result: dict) -> str:
 def show_prediction(result: dict) -> None:
     if not result.get("is_dog", True):
         st.markdown(
-            f"""
-            <div class="result-card">
-                <span class="confidence-label low">Rejected</span>
-                <h3>Not a dog</h3>
-                {render_dog_gate(result)}
-            </div>
-            """,
+            (
+                '<div class="result-card">'
+                '<span class="confidence-label low">Rejected</span>'
+                "<h3>Not a dog</h3>"
+                f"{render_dog_gate(result)}"
+                "</div>"
+            ),
             unsafe_allow_html=True,
         )
         return
 
     label = result["confidence_label"]
     low_warning = (
-        """
-        <div class="low-confidence">
-            Low-confidence prediction. The image may contain a mixed breed,
-            an unsupported breed, or no dog.
-        </div>
-        """
+        (
+            '<div class="low-confidence">'
+            "Low-confidence prediction. The image may contain a mixed breed, "
+            "an unsupported breed, or no dog."
+            "</div>"
+        )
         if result["low_confidence"]
         else ""
     )
 
     st.markdown(
-        f"""
-        <section class="result-card">
-            <span class="confidence-label {confidence_class(label)}">{escape(label)}</span>
-            <h2>Breed for this Dog is:</h2>
-            <h3>{escape(result["breed"])}</h3>
-            <div class="summary-metrics">
-                <span>
-                    <strong>{float(result["confidence_percent"]):.2f}%</strong>
-                    <small>confidence</small>
-                </span>
-                <span>
-                    <strong>{float(result["inference_time_ms"]):.2f} ms</strong>
-                    <small>analysis time</small>
-                </span>
-            </div>
-            {low_warning}
-            {render_dog_gate(result)}
-        </section>
-        """,
+        (
+            '<section class="result-card">'
+            f'<span class="confidence-label {confidence_class(label)}">'
+            f"{escape(label)}</span>"
+            "<h2>Breed for this Dog is:</h2>"
+            f'<h3>{escape(result["breed"])}</h3>'
+            '<div class="summary-metrics">'
+            "<span>"
+            f'<strong>{float(result["confidence_percent"]):.2f}%</strong>'
+            "<small>confidence</small>"
+            "</span>"
+            "<span>"
+            f'<strong>{float(result["inference_time_ms"]):.2f} ms</strong>'
+            "<small>analysis time</small>"
+            "</span>"
+            "</div>"
+            f"{low_warning}"
+            f"{render_dog_gate(result)}"
+            "</section>"
+        ),
         unsafe_allow_html=True,
     )
 
     gradcam = result.get("gradcam", {})
     breed_info = result.get("breed_info", {})
-    gradcam_html = ""
-
-    if gradcam.get("available") and gradcam.get("image"):
-        gradcam_html = (
-            '<div class="gradcam-section">'
-            "<h3>Model Attention Map:</h3>"
-            f'<img src="{escape(gradcam["image"])}" '
-            'alt="Grad-CAM heatmap overlay" />'
-            "<p>Highlighted regions indicate the image areas that most "
-            "influenced the breed prediction.</p>"
-            "</div>"
-        )
 
     st.markdown(
         (
@@ -603,7 +592,52 @@ def show_prediction(result: dict) -> None:
             '<div class="prediction-bars">'
             f'{render_prediction_bars(result.get("top_five", []))}'
             "</div>"
-            f"{gradcam_html}"
+            "</section>"
+        ),
+        unsafe_allow_html=True,
+    )
+
+    if gradcam.get("available") and gradcam.get("image"):
+        st.markdown(
+            (
+                '<section class="details-card">'
+                '<div class="gradcam-section">'
+                "<h3>Model Attention Map:</h3>"
+                "</div>"
+                "</section>"
+            ),
+            unsafe_allow_html=True,
+        )
+        st.image(gradcam["image"], use_container_width=True)
+        st.markdown(
+            (
+                '<section class="details-card" style="margin-top: 0;">'
+                '<div class="gradcam-section" style="margin-top: 0;">'
+                "<p>Highlighted regions indicate the image areas that most "
+                "influenced the breed prediction.</p>"
+                "</div>"
+                "</section>"
+            ),
+            unsafe_allow_html=True,
+        )
+    elif gradcam.get("enabled"):
+        st.markdown(
+            (
+                '<section class="details-card">'
+                '<div class="gradcam-section">'
+                "<h3>Model Attention Map:</h3>"
+                "<p>"
+                f'{escape(gradcam.get("reason", "Grad-CAM is unavailable."))}'
+                "</p>"
+                "</div>"
+                "</section>"
+            ),
+            unsafe_allow_html=True,
+        )
+
+    st.markdown(
+        (
+            '<section class="details-card">'
             '<div class="breed-info-cards">'
             '<article class="breed-info-card">'
             "<h3>Breed Description</h3>"
