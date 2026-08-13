@@ -186,6 +186,11 @@ def inject_styles() -> None:
             box-shadow: 0 10px 22px rgba(47, 93, 84, 0.22);
         }}
 
+        div.stButton {{
+            display: flex;
+            justify-content: center;
+        }}
+
         div.stButton > button:hover {{
             background: #274f48;
             color: #fff;
@@ -308,12 +313,14 @@ def inject_styles() -> None:
         }}
 
         .dog-gate-message {{
-            margin-top: 14px;
+            margin: 14px auto 0;
             padding: 10px 12px;
             border-radius: 8px;
             font-weight: 700;
             line-height: 1.45;
-        }}
+            text-align: center;
+            max-width: 650px;
+            }}
 
         .dog-gate-message.accepted {{
             color: #226647;
@@ -706,57 +713,48 @@ def show_main_card() -> None:
     )
 
 
-def predict_uploaded(uploaded_file) -> None:
-    uploaded_image = open_uploaded_image(uploaded_file)
-    st.image(uploaded_image, use_container_width=True)
-
-    if st.button("Predict Breed", type="primary", key="predict-upload"):
-        with st.spinner("Checking the image and preparing the breed analysis..."):
-            st.session_state["prediction_result"] = (
-                get_inference_service()._predict_image(uploaded_image)
-            )
-
-
-def predict_from_url(image_url: str) -> None:
-    if image_url:
-        st.image(image_url, use_container_width=True)
-
-    if st.button("Predict Breed", type="primary", key="predict-url"):
-        with st.spinner("Checking the image and preparing the breed analysis..."):
-            st.session_state["prediction_result"] = (
-                get_inference_service().predict_url(image_url)
-            )
-
-
-inject_styles()
-show_main_card()
-
-tab_upload, tab_url = st.tabs(["Upload", "Image URL"])
-
-with tab_upload:
+def show_input_controls() -> None:
     uploaded_file = st.file_uploader(
         "Choose File",
         type=["jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff"],
         help="JPEG, PNG, WebP, BMP, or TIFF up to 15 MB.",
     )
-
-    if uploaded_file is not None:
-        try:
-            predict_uploaded(uploaded_file)
-        except Exception as error:
-            st.error(str(error))
-
-with tab_url:
     image_url = st.text_input(
         "Direct image URL",
         placeholder="Paste a direct image URL",
     )
 
-    if image_url:
-        try:
-            predict_from_url(image_url)
-        except Exception as error:
-            st.error(str(error))
+    uploaded_image = None
+
+    if uploaded_file is not None:
+        uploaded_image = open_uploaded_image(uploaded_file)
+        st.image(uploaded_image, use_container_width=True)
+    elif image_url:
+        st.image(image_url, use_container_width=True)
+
+    if st.button("Predict Breed", type="primary", key="predict"):
+        if uploaded_image is None and not image_url.strip():
+            st.error("Please choose an image file or paste a direct image URL.")
+            return
+
+        with st.spinner("Checking the image and preparing the breed analysis..."):
+            if uploaded_image is not None:
+                st.session_state["prediction_result"] = (
+                    get_inference_service()._predict_image(uploaded_image)
+                )
+            else:
+                st.session_state["prediction_result"] = (
+                    get_inference_service().predict_url(image_url.strip())
+                )
+
+
+inject_styles()
+show_main_card()
+
+try:
+    show_input_controls()
+except Exception as error:
+    st.error(str(error))
 
 result = st.session_state.get("prediction_result")
 
