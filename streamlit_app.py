@@ -105,6 +105,10 @@ def inject_styles() -> None:
             color: #291313;
         }}
 
+        .main-card {{
+            border-radius: 14px 14px 0 0;
+        }}
+
         .main-title {{
             margin: 0;
             padding: 26px 16px 20px;
@@ -119,6 +123,27 @@ def inject_styles() -> None:
 
         .main-body {{
             padding: 22px 20px 18px;
+        }}
+
+        .input-shell {{
+            margin-top: -1px;
+            padding: 0 20px 22px;
+            background:
+                linear-gradient(145deg, rgba(255, 255, 255, 0.62), rgba(255, 245, 236, 0.34)),
+                rgba(255, 255, 255, 0.24);
+            backdrop-filter: blur(34px) saturate(1.18);
+            border-left: 1px solid rgba(255, 255, 255, 0.72);
+            border-right: 1px solid rgba(255, 255, 255, 0.72);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.72);
+            border-radius: 0 0 14px 14px;
+            box-shadow:
+                0 34px 90px rgba(21, 15, 13, 0.42),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.18);
+            color: #291313;
+        }}
+
+        .input-shell [data-testid="stHorizontalBlock"] {{
+            align-items: center;
         }}
 
         .upload-box {{
@@ -748,6 +773,7 @@ def show_main_card() -> None:
 
 
 def show_input_controls() -> None:
+    st.markdown('<div class="input-shell">', unsafe_allow_html=True)
     file_col, divider_col, url_col = st.columns([1.2, 0.3, 4.2], gap="small")
 
     with file_col:
@@ -793,6 +819,7 @@ def show_input_controls() -> None:
                 st.session_state["prediction_result"] = (
                     get_inference_service().predict_url(image_url.strip())
                 )
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 inject_styles()
