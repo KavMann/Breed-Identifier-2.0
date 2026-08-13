@@ -88,6 +88,8 @@ def inject_styles() -> None:
             padding-bottom: 3.2rem;
         }}
 
+        .st-key-app_card,
+        .st-key-app-card,
         .main-card,
         .result-card,
         .details-card {{
@@ -109,6 +111,33 @@ def inject_styles() -> None:
             border-radius: 14px 14px 0 0;
         }}
 
+        .st-key-app_card,
+        .st-key-app-card {{
+            padding: 0 20px 22px;
+        }}
+
+        .st-key-app_card .main-title,
+        .st-key-app-card .main-title {{
+            margin-left: -20px;
+            margin-right: -20px;
+        }}
+
+        .st-key-app_card [data-testid="stHorizontalBlock"],
+        .st-key-app-card [data-testid="stHorizontalBlock"] {{
+            align-items: center;
+        }}
+
+        .st-key-app_card [data-testid="column"],
+        .st-key-app-card [data-testid="column"] {{
+            display: flex;
+            align-items: center;
+        }}
+
+        .st-key-app_card [data-testid="column"] > div,
+        .st-key-app-card [data-testid="column"] > div {{
+            width: 100%;
+        }}
+
         .main-title {{
             margin: 0;
             padding: 26px 16px 20px;
@@ -125,36 +154,6 @@ def inject_styles() -> None:
             padding: 22px 20px 18px;
         }}
 
-        .st-key-input_shell {{
-            margin-top: -18px;
-            padding: 0 20px 22px;
-            background:
-                linear-gradient(145deg, rgba(255, 255, 255, 0.62), rgba(255, 245, 236, 0.34)),
-                rgba(255, 255, 255, 0.24);
-            backdrop-filter: blur(34px) saturate(1.18);
-            border-left: 1px solid rgba(255, 255, 255, 0.72);
-            border-right: 1px solid rgba(255, 255, 255, 0.72);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.72);
-            border-radius: 0 0 14px 14px;
-            box-shadow:
-                0 34px 90px rgba(21, 15, 13, 0.42),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.18);
-            color: #291313;
-        }}
-
-        .st-key-input_shell [data-testid="stHorizontalBlock"] {{
-            align-items: center;
-        }}
-
-        .st-key-input_shell [data-testid="column"] {{
-            display: flex;
-            align-items: center;
-        }}
-
-        .st-key-input_shell [data-testid="column"] > div {{
-            width: 100%;
-        }}
-
         .upload-box {{
             border: 2px dashed rgba(117, 91, 75, 0.35);
             padding: 24px;
@@ -165,7 +164,7 @@ def inject_styles() -> None:
             box-shadow:
                 inset 0 0 0 1px rgba(255, 255, 255, 0.5),
                 0 12px 28px rgba(43, 26, 20, 0.08);
-            margin-bottom: 14px;
+            margin: 22px 0 14px;
         }}
 
         .upload-title {{
@@ -260,7 +259,8 @@ def inject_styles() -> None:
             justify-content: center;
         }}
 
-        .st-key-input_shell [data-testid="stButton"] {{
+        .st-key-app_card [data-testid="stButton"],
+        .st-key-app-card [data-testid="stButton"] {{
             margin-top: 12px;
             justify-content: center;
         }}
@@ -770,25 +770,19 @@ def show_input_validation(result: dict) -> None:
     st.markdown(validation_message, unsafe_allow_html=True)
 
 
-def show_main_card() -> None:
-    st.markdown(
-        """
-        <section class="main-card">
+def show_app_card() -> None:
+    with st.container(key="app_card"):
+        st.markdown(
+            """
             <h1 class="main-title">DOG BREED IDENTIFICATION</h1>
-            <div class="main-body">
-                <div class="upload-box">
-                    <p class="upload-title">Drag an image into this area</p>
-                    <p class="upload-note">Use the controls below to browse locally or paste a direct image URL.</p>
-                </div>
+            <div class="upload-box">
+                <p class="upload-title">Drag an image into this area</p>
+                <p class="upload-note">Use the controls below to browse locally or paste a direct image URL.</p>
             </div>
-        </section>
-        """,
-        unsafe_allow_html=True,
-    )
+            """,
+            unsafe_allow_html=True,
+        )
 
-
-def show_input_controls() -> None:
-    with st.container(key="input_shell"):
         file_col, divider_col, url_col = st.columns(
             [1.2, 0.3, 4.2],
             gap="small",
@@ -844,10 +838,9 @@ def show_input_controls() -> None:
 
 
 inject_styles()
-show_main_card()
 
 try:
-    show_input_controls()
+    show_app_card()
 except Exception as error:
     st.error(str(error))
 
